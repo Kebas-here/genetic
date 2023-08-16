@@ -1,0 +1,66 @@
+{% extends 'partials/base.html' %}
+{% block title %}Home Page{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+    <!--Graphs-->
+    <div class="container">
+        <div class="row my-4">
+            <div class="col-md-4">
+                <div class="border bg-white p-3">
+                    <h4>Add Products</h4>
+                    <hr>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <h6>Jumlah Barang</h6>
+                        <input type="number" id="jumlah_barang" name="jumlah_barang" placeholder="Masukkan jumlah barang yang ingin dipilih">
+                        <p></p>
+                        <h6>Berat</h6>
+                        <input type="number" id="batas_bobot" name="batas_bobot" placeholder="Masukkan Bobot Maksimal">
+                        <p></p>
+                        <h6>Seleksi</h6>
+                        <input type="text" class="form-control" id="seleksi" name="seleksi" placeholder="Pilih jenis seleksi yang digunakan">
+                        <p></p>
+                        <input class="btn btn-success btn-block" type="submit" value="Submit">
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-8 mt-3">
+                <div class="border bg-white p-3">
+                    <h4>Hasil Algoritma Genetika:</h4>
+                    <div class="big-box">
+                        <p>Jumlah Barang: {{ jumlah_barang }}</p>
+                        <p>Batas Bobot: {{ batas_bobot }}</p>
+                        <p>Jenis Seleksi: {{ jenis_seleksi }}</p>
+                    </div>
+                    
+                    <h2>Hasil Kombinasi: </h2>
+                    <ul>
+                        {% for best_result in best_results %}
+                            <li>{{ best_result }}</li>
+                            <li>{{ fivebestindividuals_weights }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6 mt-3">
+                <div class="bg-white">
+                    <canvas id="myChart1" width="400" height="300"></canvas>
+                    <script>
+                        // ... (kode Chart.js untuk grafik pie)
+                    </script>
+                </div>
+            </div>
+            <div class="col-md-6 mt-3">
+                <div class="bg-white">
+                    <canvas id="myChart" width="400" height="300"></canvas>
+                    <script>
+                        // ... (kode Chart.js untuk grafik bar)
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Graphs-->
+{% endblock %}
