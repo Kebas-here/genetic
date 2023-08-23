@@ -27,8 +27,14 @@ prices = [int(product.hargam / 1000) for product in products]
 values = [int(product.harga / 1000) for product in products]
 weights = prices
 # Inisialisasi populasi
-def create_individual():
-    return [random.randint(0, 1) for _ in range(len(weights))]
+def create_individual(jumlah_barang):
+
+    while True:
+        individual = [random.randint(0, 1) for _ in range(len(weights))]
+        total = sum(individual)
+        
+        if total <= jumlah_barang:
+            return individual
 
 # Evaluasi individu
 def fitness(individual):
@@ -51,15 +57,18 @@ def selection(population):
     return random.choices(population, weights=fitness_scores, k=2)
 
 # Crossover
-def crossover(parents):
-    crossover_point = random.randint(1, len(weights) - 1)
-    child1 = parents[0][:crossover_point] + parents[1][crossover_point:]
-    child2 = parents[1][:crossover_point] + parents[0][crossover_point:]
+def crossover(parents, jumlah_barang):
+    max_attempts = 10
+    for _ in range(max_attempts):
+        crossover_point = random.randint(1, len(weights) - 1)
+        child1 = parents[0][:crossover_point] + parents[1][crossover_point:]
+        child2 = parents[1][:crossover_point] + parents[0][crossover_point:]
 
-    # Pastikan panjang kromosom anak tidak kosong setelah crossover
-    if len(child1) == 0 or len(child2) == 0:
-        return crossover(parents)
-    return child1, child2
+        if sum(child1) <= jumlah_barang and sum(child2) <= jumlah_barang:
+            return child1, child2
+
+    # Jika setelah beberapa percobaan crossover tidak berhasil, kembalikan salah satu orangtua
+    return parents[0], parents[1]
 
 # Mutasi
 def mutation(individual):
@@ -86,7 +95,7 @@ def genetic_algorithm(jumlah_barang, batas_bobot, jenis_seleksi):
     selected_individuals = []
     best_chromosomes_per_generation = []  # Menyimpan kromosom terbaik dari setiap generasi
     for no in range(population_size):
-        population = create_population()
+        population = create_population(jumlah_barang)
         selection_type = jenis_seleksi
         if selection_type == "":
             selection_type = "roulette wheel"
@@ -97,7 +106,7 @@ def genetic_algorithm(jumlah_barang, batas_bobot, jenis_seleksi):
                     parents = selection_elitism(population)
                 else:
                     parents = selection(population)
-                children = crossover(parents)
+                children = crossover(parents, jumlah_barang)
                 child1 = mutation(children[0])
                 child2 = mutation(children[1])
                 new_population.append(child1)
@@ -123,23 +132,22 @@ def genetic_algorithm(jumlah_barang, batas_bobot, jenis_seleksi):
         selected_results = []
         for chromosome in best_result:
             selected_indexes = [i for i, chrom in enumerate(chromosome) if chrom > 0]
+            selected_indexes_with_offset = [index + 1 for index in selected_indexes]
             selected_weights = [weights[i] for i in selected_indexes]
             selected_values = [values[i] for i in selected_indexes]
             total_weight = sum(selected_weights)
             total_value = sum(selected_values)
-            selected_indexes_with_offset = [index + 1 for index in selected_indexes]
-            selected_products = Product.objects.filter(id__in=selected_indexes_with_offset)
             selected_product_names = [products[i - 1].nama for i in selected_indexes_with_offset]
             selected_results.append({
-                'kromosom' : chromosome,
-                'total_berat': total_weight,
-                'total_nilai': total_value,
-                'kromosom': selected_indexes_with_offset,
-                'nama_produk' : selected_product_names,
+                
+                'produk ke ' : selected_indexes_with_offset,
+                'Modal ': total_weight,
+                'Harga Jual': total_value, 
+                'Nama Produk' : selected_product_names,
             })
 
     return selected_results
 # Panggil fungsi create_population di dalam fungsi genetic_algorithm
-def create_population():
-    return [create_individual() for _ in range(population_size)]
+def create_population(jumlah_barang):
+    return [create_individual(jumlah_barang) for _ in range(population_size)]
 
