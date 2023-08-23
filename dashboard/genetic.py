@@ -22,6 +22,7 @@ capacity = 0  # Inisialisasi awal capacity
 population_size = 20
 generations = 30
 products = Product.objects.all()
+product_names = [str(product.nama for product in products)]
 prices = [int(product.hargam / 1000) for product in products]
 values = [int(product.harga / 1000) for product in products]
 weights = prices
@@ -127,17 +128,18 @@ def genetic_algorithm(jumlah_barang, batas_bobot, jenis_seleksi):
             total_weight = sum(selected_weights)
             total_value = sum(selected_values)
             selected_indexes_with_offset = [index + 1 for index in selected_indexes]
-
+            selected_products = Product.objects.filter(id__in=selected_indexes_with_offset)
+            selected_product_names = [products[i - 1].nama for i in selected_indexes_with_offset]
             selected_results.append({
                 'kromosom' : chromosome,
-                'berat': selected_weights,
                 'total_berat': total_weight,
-                'nilai': selected_values,
                 'total_nilai': total_value,
                 'kromosom': selected_indexes_with_offset,
+                'nama_produk' : selected_product_names,
             })
 
     return selected_results
 # Panggil fungsi create_population di dalam fungsi genetic_algorithm
 def create_population():
     return [create_individual() for _ in range(population_size)]
+

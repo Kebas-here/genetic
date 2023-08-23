@@ -30,4 +30,9 @@ class Migration(migrations.Migration):
             name='nama',
             field=models.CharField(max_length=100, null=True),
         ),
+        migrations.AlterField(
+            model_name='product',
+            name='noproduk',
+            field=models.AutoField(primary_key=True),
+        ),
     ]

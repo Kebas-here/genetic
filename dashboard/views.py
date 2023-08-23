@@ -7,18 +7,19 @@ from django.contrib.auth.models import User
 
 # Create your views here.
 def index(request):
+    products = Product.objects.all()
+    prices = [int(product.hargam / 1000) for product in products]
+    values = [int(product.harga / 1000) for product in products]
     if request.method == 'POST':
         jumlah_barang = int(request.POST.get('jumlah_barang', 0))
         batas_bobot = int(request.POST.get('batas_bobot', 0))
         jenis_seleksi = request.POST.get('seleksi', '')
-        
-        # Validasi jika tombol "Submit" ditekan dan nilai 'jumlah_barang' atau 'batas_bobot' tidak valid
-        #if jumlah_barang <= 0 or batas_bobot <= 0:
-         #   return HttpResponse("Jumlah barang dan batas bobot harus lebih dari 0.")
-        
-        #else:
-        # Panggil fungsi genetic_algorithm dengan meneruskan nilai jumlah_barang dan batas_bobot
-        #result = genetic_algorithm(jumlah_barang, batas_bobot, jenis_seleksi)
+        if jumlah_barang <= 0 or batas_bobot <= 0:
+            return render(request, 'dashboard/index.html', {'error_message': "Jumlah barang dan batas bobot harus lebih dari 0."})
+
+        if jumlah_barang > len(products):
+            return render(request, 'dashboard/index.html', {'error_message': "Jumlah barang yang ingin dipilih melebihi jumlah barang yang ada."})
+
         best_result = genetic_algorithm(jumlah_barang, batas_bobot, jenis_seleksi)
 
         # Buat context dictionary dengan data yang ingin dikirimkan ke template
