@@ -20,7 +20,15 @@
                         <input type="number" id="batas_bobot" name="batas_bobot" placeholder="Masukkan Bobot Maksimal">
                         <p></p>
                         <h6>Seleksi</h6>
-                        <input type="text" class="form-control" id="seleksi" name="seleksi" placeholder="Pilih jenis seleksi yang digunakan">
+                        <label class="radio-inline">
+                            <input type="radio" name="seleksi" value="elitism"> Elitism
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="seleksi" value="roulette_wheel"> Roulette Wheel Selection
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="seleksi" value="tournament"> Tournament Selection
+                        </label>
                         <p></p>
                         <input class="btn btn-success btn-block" type="submit" value="Submit">
                     </form>

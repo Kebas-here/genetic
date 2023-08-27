@@ -56,6 +56,14 @@ def selection(population):
         return random.choices(population, k=2)
     return random.choices(population, weights=fitness_scores, k=2)
 
+def selection_tournament(population, tournament_size):
+    tournament_size = 3  # Ukuran turnamen
+    selected_parents = []
+    for _ in range(len(population)):
+        tournament_candidates = random.sample(population, tournament_size)
+        winner = max(tournament_candidates, key=lambda individual: fitness(individual))
+        selected_parents.append(winner)
+    return selected_parents
 # Crossover
 def crossover(parents, jumlah_barang):
     max_attempts = 10
@@ -97,13 +105,15 @@ def genetic_algorithm(jumlah_barang, batas_bobot, jenis_seleksi):
     for no in range(population_size):
         population = create_population(jumlah_barang)
         selection_type = jenis_seleksi
-        if selection_type == "":
-            selection_type = "roulette wheel"
+        if selection_type == "tournament":
+            selection_type = "tournament"
         for generation in range(generations):
             new_population = []
             for _ in range(population_size // 2):
                 if selection_type == "elitism":
                     parents = selection_elitism(population)
+                elif selection_type == "tournament":
+                    parents = selection_tournament(population, tournament_size=3)
                 else:
                     parents = selection(population)
                 children = crossover(parents, jumlah_barang)
@@ -124,7 +134,6 @@ def genetic_algorithm(jumlah_barang, batas_bobot, jenis_seleksi):
 
         best_chromosome = max(population, key=fitness)
         best_chromosomes_per_generation.append(best_chromosome)
-
         # Mengambil 5 kromosom terbaik dari setiap generasi berdasarkan fitness score
         best_result = sorted(best_chromosomes_per_generation, key=fitness, reverse=True)[:5]
 
